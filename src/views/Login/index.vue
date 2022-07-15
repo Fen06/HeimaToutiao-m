@@ -84,7 +84,7 @@ export default {
         const res = await login(this.mobile, this.code)
         // 储存token
         this.$store.commit('setuser', res.data.data)
-        this.$router.push('/priect')
+        this.$router.push('/profile')
         // console.log(res)
         this.$toast.success('登录成功')
       } catch (error) {
