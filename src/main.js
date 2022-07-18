@@ -8,6 +8,7 @@ import Vant from 'vant'
 import 'vant/lib/index.css'
 
 import 'amfe-flexible/index.js'
+
 Vue.use(Vant)
 Vue.config.productionTip = false
 

@@ -10,27 +10,31 @@
     </van-nav-bar>
 
     <van-tabs v-model="active" swipeable>
-      <van-tab v-for="item in channel" :key="item.id" :title="item.name">
+      <van-tab v-for="item in myChannels" :key="item.id" :title="item.name">
         <AtricleList :id="item.id"></AtricleList>
       </van-tab>
-      <span class="toutiao toutiao-gengduo"></span>
+      <span class="toutiao toutiao-gengduo" @click="PopUp"></span>
     </van-tabs>
+
+    <EditChannelPopup ref="popup" :myChannels="myChannels"></EditChannelPopup>
   </div>
 </template>
 
 <script>
 import { getMyChannels } from '@/api'
+import EditChannelPopup from './component/EditChannelPopup.vue'
 import AtricleList from '@/views/Home/component/AtricleList.vue'
 export default {
   name: 'home',
   data () {
     return {
-      active: 2,
-      channel: []
+      active: 0,
+      myChannels: []
     }
   },
   components: {
-    AtricleList
+    AtricleList,
+    EditChannelPopup
   },
 
   created () {
@@ -41,17 +45,42 @@ export default {
     async getMyChannels () {
       try {
         const { data } = await getMyChannels()
-        this.channel = data.data.channels
-        console.log(this.channel)
+        this.myChannels = data.data.channels
+        // console.log(this.channel)
       } catch (error) {
         this.$toast.fail('数据请求失败，请重试')
       }
+    },
+
+    PopUp () {
+      this.$refs.popup.isShow = true
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+// 头部固定的样式
+.navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+}
+:deep(.van-tabs__wrap) {
+  position: sticky;
+  top: 92px;
+  left: 0;
+  z-index: 99;
+}
+.toutiao-gengduo {
+  position: fixed;
+  top: 92px;
+}
+
+:deep(.van-tabs__content) {
+  max-height: calc(100vh - 92px - 82px - 100px);
+  overflow: auto;
+}
 //tabs选项卡
 :deep(.van-tabs__wrap) {
   padding-right: 66px;
@@ -83,6 +112,7 @@ export default {
   top: 0;
   right: 0;
   width: 66px;
+  z-index: 99;
   height: 82px;
   font-size: 40px;
   line-height: 82px;
@@ -122,5 +152,9 @@ export default {
   .van-button--default {
     border: 0.02667rem solid #5babfb;
   }
+}
+:deep(.van-popup__close-icon--top-right) {
+  top: 0.42667rem;
+  left: 0.42667rem;
 }
 </style>
