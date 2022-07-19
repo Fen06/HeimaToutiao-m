@@ -10,17 +10,29 @@
         <!-- 我的频道 -->
         <div class="my-channel">
           <van-cell title="我的频道">
-            <van-button size="small" round class="edit-btn"> 编辑 </van-button>
+            <van-button
+              size="small"
+              round
+              class="edit-btn"
+              @click="isEeit = !isEeit"
+            >
+              {{ isEeit ? '完成' : '编辑' }}
+            </van-button>
           </van-cell>
 
           <van-grid gutter="10px" :border="false">
             <van-grid-item
-              v-for="item in myChannels"
+              v-for="(item, index) in myChannels"
               :key="item.id"
               :text="item.name"
+              :class="{ active: item.name === '推荐' }"
+              @click="onClickChannel(item, index)"
             >
               <template #icon>
-                <van-icon name="cross" />
+                <van-icon
+                  name="cross"
+                  v-show="isEeit && item.name !== '推荐'"
+                />
               </template>
             </van-grid-item>
           </van-grid>
@@ -30,10 +42,11 @@
           <van-cell title="推荐频道"></van-cell>
           <van-grid gutter="10px" :border="false">
             <van-grid-item
-              v-for="item in allChannels"
+              v-for="item in recommendChannel"
               :key="item.id"
               :text="item.name"
               icon="plus"
+              @click="addMyChannel(item)"
             ></van-grid-item>
           </van-grid>
         </div>
@@ -56,8 +69,9 @@ export default {
   },
   data () {
     return {
-      isShow: true,
-      allChannels: []
+      isShow: false,
+      allChannels: [],
+      isEeit: false
     }
   },
 
@@ -66,6 +80,18 @@ export default {
       const { data } = await getAllChannels()
       console.log(data)
       this.allChannels = data.data.channels
+    },
+    onClickChannel (val, index) {
+      if (this.isEeit && val.name !== '推荐') {
+        return this.$emit('delChannel', val.id)
+      }
+      if (!this.isEeit) {
+        this.isShow = false
+        this.$emit('change-channel', index)
+      }
+    },
+    addMyChannel (myChannel) {
+      this.$emit('addMyChannel', { ...myChannel })
     }
   },
 
@@ -80,8 +106,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.active {
+  :deep(.van-grid-item__text) {
+    color: red;
+  }
+}
+
 .popupMain {
   margin-top: 1.3rem;
+
   .edit-btn {
     color: red;
     padding: 0 0.426rem;

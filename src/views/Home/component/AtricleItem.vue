@@ -24,8 +24,8 @@
       <template #label>
         <div class="jucc">
           <van-image
-            v-for="item in articleInfo.cover.images"
-            :key="item"
+            v-for="(item, index) in articleInfo.cover.images"
+            :key="index"
             width="2.88rem"
             height="2rem"
             :src="item"

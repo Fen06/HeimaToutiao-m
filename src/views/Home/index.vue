@@ -16,12 +16,24 @@
       <span class="toutiao toutiao-gengduo" @click="PopUp"></span>
     </van-tabs>
 
-    <EditChannelPopup ref="popup" :myChannels="myChannels"></EditChannelPopup>
+    <EditChannelPopup
+      ref="popup"
+      :myChannels="myChannels"
+      @delChannel="delChannel"
+      @change-channel="changeChannel"
+      @addMyChannel="addMyChannel"
+    ></EditChannelPopup>
   </div>
 </template>
 
 <script>
-import { getMyChannels } from '@/api'
+import {
+  getMyChannels,
+  getMyChannelsLocal,
+  setMyChannelsLocal,
+  removeChannel,
+  addChannel
+} from '@/api'
 import EditChannelPopup from './component/EditChannelPopup.vue'
 import AtricleList from '@/views/Home/component/AtricleList.vue'
 export default {
@@ -40,12 +52,30 @@ export default {
   created () {
     this.getMyChannels()
   },
+  computed: {
+    isLogin () {
+      return !!this.$store.state.user.token
+    }
+  },
 
   methods: {
     async getMyChannels () {
       try {
-        const { data } = await getMyChannels()
-        this.myChannels = data.data.channels
+        // 如果为离线状态
+        // 就使用本地存储
+        if (!this.isLogin) {
+          const myChannels = getMyChannelsLocal()
+          if (myChannels) {
+            this.myChannels = myChannels
+          } else {
+            // 如果没有数据就请求数据
+            const { data } = await getMyChannels()
+            this.myChannels = data.data.channels
+          }
+        } else {
+          const { data } = await getMyChannels()
+          this.myChannels = data.data.channels
+        }
         // console.log(this.channel)
       } catch (error) {
         this.$toast.fail('数据请求失败，请重试')
@@ -54,6 +84,39 @@ export default {
 
     PopUp () {
       this.$refs.popup.isShow = true
+    },
+    async delChannel (id) {
+      this.myChannels = this.myChannels.filter((ele) => ele.id !== id)
+      // 如果为离线状态
+      // 就把数据存储在本地
+      if (!this.isLogin) {
+        setMyChannelsLocal(this.myChannels)
+      } else {
+        try {
+          await removeChannel(id)
+        } catch (error) {
+          return this.$toast.fail('删除用户频道失败')
+        }
+      }
+      this.$toast.success('删除用户频道成功')
+    },
+    changeChannel (active) {
+      this.active = active
+    },
+    async addMyChannel (channel) {
+      this.myChannels.push(channel)
+      // 如果为离线状态
+      // 就把数据存储在本地
+      if (!this.isLogin) {
+        setMyChannelsLocal(this.myChannels)
+      } else {
+        try {
+          await addChannel(channel.id, this.myChannels.length)
+        } catch (error) {
+          return this.$toast.fail('添加用户频道失败')
+        }
+      }
+      this.$toast.success('添加用户频道成功')
     }
   }
 }
