@@ -8,7 +8,7 @@
         placeholder="请输入搜索关键词"
         background="#3296fa"
         @search="onSearch"
-        @cancel="onCancel(val)"
+        @cancel="onCancel"
         @focus="viewSearchSuggestion"
       />
     </form>
@@ -33,7 +33,7 @@ export default {
       keyword: '',
       isShowSearchResults: false,
       Rapsugg: [],
-      en: []
+      searchInfo: []
     }
   },
   components: {
@@ -45,9 +45,10 @@ export default {
     console.log(localStorage.getItem('HistoryLish'))
   },
   methods: {
-    onSearch (val) {
+    onSearch () {
       this.isShowSearchResults = true
-      this.en = val
+      this.searchInfo.push(this.keyword)
+      this.$store.commit('search', this.searchInfo)
     },
     onCancel () {
       this.$router.go(-1)
@@ -73,12 +74,6 @@ export default {
       }
       return 'SearchSuggestion'
     }
-    // SearchResultData () {
-    //   const reg = new RegExp(this.keyword, 'ig')
-    //   return this.Rapsugg.map((item) =>
-    //     item.replace(reg, (`<span style='color:red'>${match}</span>`) => `${match}`)
-    //   )
-    // }
   }
 }
 </script>

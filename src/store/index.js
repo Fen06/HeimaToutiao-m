@@ -1,18 +1,23 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 // import storage from '@/utils/storage'
-import { setToken, getToken } from '@/utils'
+import { setToken, getToken, setSearch, getSearch } from '@/utils'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: getToken() || {}
+    user: getToken() || {},
+    search: getSearch() || []
   },
 
   mutations: {
     setuser (state, payload) {
       state.user = payload
       setToken(payload)
+    },
+    setSearch (state, SearchInfo) {
+      state.search = SearchInfo
+      setSearch(SearchInfo)
     }
   }
 })

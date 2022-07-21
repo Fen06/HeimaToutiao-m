@@ -31,14 +31,10 @@ export default {
     if (JSON.parse(localStorage.getItem('HistoryLish'))) {
       this.HistoryLish = JSON.parse(localStorage.getItem('HistoryLish'))
     }
-    console.log(this.HistoryLish)
   },
   data () {
     return {
-      suggestion: [],
-
-      // History: JSON.parse(localStorage.getItem('list')) || []
-      HistoryLish: []
+      suggestion: []
     }
   },
   methods: {

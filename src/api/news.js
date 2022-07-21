@@ -9,3 +9,10 @@ export const getActiveList = (channelId, timestamp) => {
     }
   })
 }
+
+// /v1_0/articles/:article_id
+export const getDetailsActive = (id) => {
+  return request({
+    url: `/v1_0/articles/${id}`
+  })
+}
