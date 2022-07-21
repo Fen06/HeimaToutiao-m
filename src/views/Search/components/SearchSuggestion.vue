@@ -1,12 +1,17 @@
 <template>
   <div>
     <van-cell-group>
-      <van-cell v-for="(item, index) in HigthLightData" :key="index">
+      <van-cell
+        class="btn-cell"
+        v-for="(item, index) in HigthLightData"
+        :key="index"
+        @click="GoSearch(item)"
+      >
         <template #icon>
           <van-icon name="search" class="search-icon" />
         </template>
         <template #title>
-          <span v-html="item"></span>
+          <span v-html="item" class="item"></span>
         </template>
       </van-cell>
     </van-cell-group>
@@ -22,18 +27,18 @@ export default {
       required: true
     }
   },
-
-  watch: {
-    keyword: {
-      immediate: true,
-      handler () {
-        this.getSearchSuggestion()
-      }
+  mounted () {
+    if (JSON.parse(localStorage.getItem('HistoryLish'))) {
+      this.HistoryLish = JSON.parse(localStorage.getItem('HistoryLish'))
     }
+    console.log(this.HistoryLish)
   },
   data () {
     return {
-      suggestion: []
+      suggestion: [],
+
+      // History: JSON.parse(localStorage.getItem('list')) || []
+      HistoryLish: []
     }
   },
   methods: {
@@ -47,6 +52,34 @@ export default {
         this.suggestion = res.data.data.options.filter(Boolean)
       } catch (error) {
         this.$toast.fail('获取数据失败,请重试')
+      }
+    },
+    GoSearch (val) {
+      console.log(val)
+      const str = val.replace(/<[^>]*>/g, '')
+      this.$emit('result', str)
+      if (!this.HistoryLish.includes(str)) {
+        this.HistoryLish.unshift(str)
+        localStorage.setItem('HistoryLish', JSON.stringify(this.HistoryLish))
+      } else {
+        const i = this.HistoryLish.indexOf(str)
+        this.HistoryLish.splice(i, 1)
+        this.HistoryLish.unshift(str)
+        localStorage.setItem('HistoryLish', JSON.stringify(this.HistoryLish))
+      }
+    }
+  },
+  watch: {
+    keyword: {
+      immediate: true,
+      handler () {
+        this.getSearchSuggestion()
+      }
+    },
+    History: {
+      deep: true,
+      handler (val) {
+        localStorage.setItem('list', JSON.stringify(val || []))
       }
     }
   },

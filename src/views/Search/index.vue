@@ -8,14 +8,18 @@
         placeholder="请输入搜索关键词"
         background="#3296fa"
         @search="onSearch"
-        @cancel="onCancel"
+        @cancel="onCancel(val)"
         @focus="viewSearchSuggestion"
       />
     </form>
     <!-- <SearchHistory></SearchHistory>
     <SearchResult></SearchResult>
     <SearchSuggestion></SearchSuggestion> -->
-    <component :is="compentName" :keyword="keyword"></component>
+    <component
+      :is="compentName"
+      :keyword="keyword"
+      @result="result"
+    ></component>
   </div>
 </template>
 
@@ -27,7 +31,9 @@ export default {
   data () {
     return {
       keyword: '',
-      isShowSearchResults: false
+      isShowSearchResults: false,
+      Rapsugg: [],
+      en: []
     }
   },
   components: {
@@ -35,15 +41,25 @@ export default {
     SearchResult,
     SearchSuggestion
   },
+  created () {
+    console.log(localStorage.getItem('HistoryLish'))
+  },
   methods: {
-    onSearch () {
+    onSearch (val) {
       this.isShowSearchResults = true
+      this.en = val
     },
     onCancel () {
       this.$router.go(-1)
     },
     viewSearchSuggestion () {
       this.isShowSearchResults = false
+    },
+
+    result (str) {
+      console.log(str)
+      this.keyword = str
+      this.onSearch()
     }
   },
 
@@ -57,6 +73,12 @@ export default {
       }
       return 'SearchSuggestion'
     }
+    // SearchResultData () {
+    //   const reg = new RegExp(this.keyword, 'ig')
+    //   return this.Rapsugg.map((item) =>
+    //     item.replace(reg, (`<span style='color:red'>${match}</span>`) => `${match}`)
+    //   )
+    // }
   }
 }
 </script>
