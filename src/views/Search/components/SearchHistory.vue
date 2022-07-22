@@ -41,6 +41,7 @@
 export default {
   data () {
     return {
+      // HistoryLI: JSON.parse(localStorage.getItem('HistoryLish')),
       HistoryLI: JSON.parse(localStorage.getItem('HistoryLish')),
       isDelet: true
     }

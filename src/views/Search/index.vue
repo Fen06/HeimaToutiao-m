@@ -12,9 +12,6 @@
         @focus="viewSearchSuggestion"
       />
     </form>
-    <!-- <SearchHistory></SearchHistory>
-    <SearchResult></SearchResult>
-    <SearchSuggestion></SearchSuggestion> -->
     <component
       :is="compentName"
       :keyword="keyword"
@@ -32,8 +29,7 @@ export default {
     return {
       keyword: '',
       isShowSearchResults: false,
-      Rapsugg: [],
-      searchInfo: []
+      en: []
     }
   },
   components: {
@@ -41,14 +37,20 @@ export default {
     SearchResult,
     SearchSuggestion
   },
-  created () {
-    console.log(localStorage.getItem('HistoryLish'))
-  },
+  // created () {
+  //   console.log(localStorage.getItem('HistoryLish'))
+  // },
+  // created () {
+  //   this.searchInfo = this.$store.state.search
+  // },
+
   methods: {
     onSearch () {
       this.isShowSearchResults = true
-      this.searchInfo.push(this.keyword)
-      this.$store.commit('search', this.searchInfo)
+      const res = this.keyword
+      this.en.push(res)
+      // this.searchInfo.push(this.keyword)
+      // this.$store.commit('search', this.searchInfo)
     },
     onCancel () {
       this.$router.go(-1)

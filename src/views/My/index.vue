@@ -25,16 +25,16 @@
         </van-row>
         <van-row>
           <van-grid :border="false" class="grid">
-            <van-grid-item text="文字">
+            <van-grid-item text="头条">
               <template #icon> {{ userinfo.art_count }} </template>
             </van-grid-item>
-            <van-grid-item text="文字">
+            <van-grid-item text="粉丝">
               <template #icon> {{ userinfo.fans_count }} </template>
             </van-grid-item>
-            <van-grid-item text="文字">
+            <van-grid-item text="关注">
               <template #icon> {{ userinfo.follow_count }} </template>
             </van-grid-item>
-            <van-grid-item text="文字">
+            <van-grid-item text="获赞">
               <template #icon> {{ userinfo.like_count }} </template>
             </van-grid-item>
           </van-grid>
@@ -112,7 +112,7 @@ export default {
             data: { data }
           } = await getUserInfo()
           this.userinfo = data
-          // console.log(this.userinfo)
+          console.log(this.userinfo)
         } catch (error) {
           this.$toast.fail('登录失败，请重试')
         }

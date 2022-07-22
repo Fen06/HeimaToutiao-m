@@ -27,6 +27,7 @@ export default {
       required: true
     }
   },
+
   mounted () {
     if (JSON.parse(localStorage.getItem('HistoryLish'))) {
       this.HistoryLish = JSON.parse(localStorage.getItem('HistoryLish'))
