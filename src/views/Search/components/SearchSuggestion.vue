@@ -39,6 +39,7 @@ export default {
     }
   },
   methods: {
+    // 获取搜索建议
     async getSearchSuggestion () {
       try {
         const res = await getSearchSuggestion(this.keyword)
@@ -51,19 +52,11 @@ export default {
         this.$toast.fail('获取数据失败,请重试')
       }
     },
+    // 点击搜索
     GoSearch (val) {
       console.log(val)
       const str = val.replace(/<[^>]*>/g, '')
-      this.$emit('result', str)
-      if (!this.HistoryLish.includes(str)) {
-        this.HistoryLish.unshift(str)
-        localStorage.setItem('HistoryLish', JSON.stringify(this.HistoryLish))
-      } else {
-        const i = this.HistoryLish.indexOf(str)
-        this.HistoryLish.splice(i, 1)
-        this.HistoryLish.unshift(str)
-        localStorage.setItem('HistoryLish', JSON.stringify(this.HistoryLish))
-      }
+      this.$emit('getSearchSuggestion', str)
     }
   },
   watch: {
@@ -72,13 +65,13 @@ export default {
       handler () {
         this.getSearchSuggestion()
       }
-    },
-    History: {
-      deep: true,
-      handler (val) {
-        localStorage.setItem('list', JSON.stringify(val || []))
-      }
     }
+    // History: {
+    //   deep: true,
+    //   handler (val) {
+    //     localStorage.setItem('list', JSON.stringify(val || []))
+    //   }
+    // }
   },
   computed: {
     HigthLightData () {

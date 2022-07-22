@@ -15,9 +15,9 @@ export default new Vuex.Store({
       state.user = payload
       setToken(payload)
     },
-    setSearch (state, SearchInfo) {
-      state.search = SearchInfo
-      setSearch(SearchInfo)
+    setSearch (state, searchinfo) {
+      state.search = searchinfo
+      setSearch(searchinfo)
     }
   }
 })

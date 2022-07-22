@@ -115,6 +115,7 @@ export default {
           console.log(this.userinfo)
         } catch (error) {
           this.$toast.fail('登录失败，请重试')
+          this.$router.push('/login')
         }
       }
     },

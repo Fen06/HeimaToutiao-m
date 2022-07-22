@@ -15,7 +15,11 @@
     <component
       :is="compentName"
       :keyword="keyword"
-      @result="result"
+      :searchinfo="searchinfo"
+      @getSearchSuggestion="getSearchSuggestion"
+      @deletHistory="deletHistory"
+      @OnHistory="OnHistory"
+      @Alldelet="Alldelet"
     ></component>
   </div>
 </template>
@@ -29,7 +33,7 @@ export default {
     return {
       keyword: '',
       isShowSearchResults: false,
-      en: []
+      searchinfo: []
     }
   },
   components: {
@@ -40,17 +44,24 @@ export default {
   // created () {
   //   console.log(localStorage.getItem('HistoryLish'))
   // },
-  // created () {
-  //   this.searchInfo = this.$store.state.search
-  // },
+  created () {
+    this.searchinfo = this.$store.state.search
+  },
 
   methods: {
     onSearch () {
       this.isShowSearchResults = true
-      const res = this.keyword
-      this.en.push(res)
-      // this.searchInfo.push(this.keyword)
-      // this.$store.commit('search', this.searchInfo)
+      // const res = this.keyword
+
+      if (!this.searchinfo.includes(this.keyword)) {
+        this.searchinfo.unshift(this.keyword)
+        this.$store.commit('setSearch', this.searchinfo)
+      } else {
+        const i = this.searchinfo.indexOf(this.keyword)
+        this.searchinfo.splice(i, 1)
+        this.searchinfo.unshift(this.keyword)
+        this.$store.commit('setSearch', this.searchinfo)
+      }
     },
     onCancel () {
       this.$router.go(-1)
@@ -59,8 +70,24 @@ export default {
       this.isShowSearchResults = false
     },
 
-    result (str) {
-      console.log(str)
+    getSearchSuggestion (str) {
+      this.keyword = str
+      this.onSearch()
+    },
+    // 单个删除
+    deletHistory (index) {
+      this.searchinfo.splice(index, 1)
+      this.$store.commit('setSearch', this.searchinfo)
+    },
+    // 全部删除
+    Alldelet (ele) {
+      if (ele === 0) {
+        this.searchinfo = []
+      }
+      this.$store.commit('setSearch', this.searchinfo)
+    },
+    // 点击历史记录进行搜索
+    OnHistory (str) {
       this.keyword = str
       this.onSearch()
     }

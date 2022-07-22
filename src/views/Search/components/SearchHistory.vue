@@ -8,14 +8,15 @@
       v-if="isDelet"
     ></van-icon>
     <div class="btn" v-else>
-      <span @click="empty">全部删除</span>
+      <span @click="Alldelet(0)">全部删除</span>
       <span @click="isDelet = true"> 完成</span>
     </div>
     <van-cell-group
-      v-for="(item, index) in HistoryLI"
+      v-for="(item, index) in searchinfo"
       :key="index"
-      @click="GoSearch(item)"
+      @click="GoSearch(item, index)"
     >
+      <!--  -->
       <van-cell>
         <template #icon>
           <van-icon name="search" class="search-icon" />
@@ -29,7 +30,7 @@
             name="close"
             v-show="isDelet == false"
             class="Delet"
-            @click="dele(item)"
+            @click="delet(item, index)"
           />
         </template>
       </van-cell>
@@ -39,28 +40,37 @@
 
 <script>
 export default {
+  props: {
+    searchinfo: {
+      type: Array,
+      default: () => [],
+      required: true
+    }
+  },
   data () {
     return {
       // HistoryLI: JSON.parse(localStorage.getItem('HistoryLish')),
-      HistoryLI: JSON.parse(localStorage.getItem('HistoryLish')),
       isDelet: true
     }
   },
   methods: {
+    // 删除全部
+    Alldelet (ele) {
+      if (!this.isDelet) {
+        this.$emit('Alldelet', ele)
+      }
+    },
+    // 单个删除
+    delet (item, index) {
+      if (!this.isDelet) {
+        return this.$emit('deletHistory', index)
+      }
+      this.$emit('getSearchSuggestion', item)
+    },
+    // 历史记录点击搜索
     GoSearch (val) {
       console.log(val)
-
-      this.$emit('result', val)
-    },
-    empty () {
-      localStorage.removeItem('HistoryLI')
-      this.HistoryLI = []
-    },
-    dele (val) {
-      const index = this.HistoryLI.findIndex((ele) => ele === val)
-      this.HistoryLI.splice(index, 1)
-      localStorage.setItem('HistoryLish', JSON.stringify(this.HistoryLI))
-      this.HistoryLI = JSON.parse(localStorage.getItem('HistoryLish'))
+      this.$emit('OnHistory', val)
     }
   }
 }
