@@ -3,8 +3,8 @@
     <!-- 无图片 -->
     <router-link
       :to="{
-        name: 'details',
-        params: {
+        path: '/details',
+        query: {
           detailsId: articleInfo.art_id
         }
       }"
@@ -18,8 +18,8 @@
     <!-- 一张图片 -->
     <router-link
       :to="{
-        name: 'details',
-        params: {
+        path: '/details',
+        query: {
           detailsId: articleInfo.art_id
         }
       }"
@@ -39,8 +39,8 @@
     <!-- 三张图片 -->
     <router-link
       :to="{
-        name: 'details',
-        params: {
+        path: '/details',
+        query: {
           detailsId: articleInfo.art_id
         }
       }"

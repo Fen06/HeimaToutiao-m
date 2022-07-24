@@ -1,25 +1,56 @@
 import request from '@/utils/request'
-export const getComments = (a, id) => {
+
+// 发送评论
+export const getMyComments = (target, text) => {
   return request({
     url: '/v1_0/comments',
+    method: 'POST',
+    data: {
+      target: target,
+      content: text
+    }
+  })
+}
+// /v1_0/comments
+// 获取文章评论
+export const getActiveComments = (type, source) => {
+  return request({
+    url: '/v1_0/comments',
+    method: 'GET',
     params: {
-      type: a,
-      source: id,
-      offset: 1,
-      limit: 10
+      type: type,
+      source: source
+    }
+  })
+}
+// 对文章评论进行点赞
+export const getActiveCommentsNice = (target) => {
+  return request({
+    url: '/v1_0/comment/likings',
+    method: 'POST',
+    data: {
+      target: target
     }
   })
 }
 
-export const getMyComments = (target, artId, text) => {
+// 对文章评论取消点赞
+export const getActiveCommentsNoNice = (target) => {
+  return request({
+    url: `/v1_0/comment/likings/${target}`,
+    method: 'DELETE'
+  })
+}
+
+// 对文章里的评论进行评论
+export const getMyInComments = (target, text, artId) => {
   return request({
     url: '/v1_0/comments',
     method: 'POST',
     data: {
       target: target,
       content: text,
-      artId: artId
+      art_id: artId
     }
   })
 }
-// /v1_0/comments

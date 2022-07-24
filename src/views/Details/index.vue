@@ -45,8 +45,16 @@
 
     <!-- 正文 -->
     <div class="ZhengWen-box">
-      <span v-html="active.content" class="ZhengWen markdown-body"></span>
+      <span
+        ref="contentRefs"
+        v-html="active.content"
+        class="ZhengWen markdown-body"
+      >
+      </span>
+
+      <!--  -->
     </div>
+
     <!-- 正文结束 -->
     <div class="divider">
       <!-- 细线 -->
@@ -54,34 +62,155 @@
       <span class="text-End">正文结束</span>
     </div>
     <!-- 评论 -->
-
-    <van-row class="comment">
-      <van-col span="3" class="comment-left">
-        <img src="http://toutiao.itheima.net/uploads/1658452200198.blob" />
-      </van-col>
-      <van-col span="7">
-        <span class="comment-name">评论者的ID</span>
-      </van-col>
-      <van-col span="2" offset="12" class="comment-right">
-        <van-icon class="nice" name="good-job-o" /><span class="num">1</span>
-      </van-col>
-    </van-row>
-    <!-- 评论+时间+回复 -->
-    <div class="comment-pople">
-      <van-row class="comment-text"
-        ><p class="text">
-          XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-        </p></van-row
-      >
-      <van-row class="reply">
-        <van-col span="4" class="reply-timer">{{ timer }}</van-col>
-        <van-col span="6"
-          ><van-button plain type="primary" round class="reply-btn"
-            >回复 1</van-button
-          ></van-col
+    <van-list
+      v-model="loading"
+      :finished="finished"
+      :immediate-check="false"
+      offset="1"
+      finished-text="没有更多了"
+      @load="onLoad"
+    >
+      <!-- 对文章的评论 -->
+      <van-cell v-for="(item, index) in comments" :key="index">
+        <van-image
+          slot="icon"
+          round
+          width="40"
+          height="40"
+          style="margin-right: 10px"
+          :src="item.aut_photo"
+        />
+        <span style="color: #466b9d" slot="title">{{ item.aut_name }}</span>
+        <div slot="label">
+          <p style="color: #363636">{{ item.content }}</p>
+          <p>
+            <span class="timer">{{ CommentTimer }}</span>
+            <van-button
+              size="small"
+              type="default"
+              round
+              class="Huif"
+              @click="reply(item.com_id)"
+              >回复 {{ item.reply_count }}
+            </van-button>
+          </p>
+        </div>
+        <van-icon
+          v-show="item.is_liking === false"
+          slot="right-icon"
+          name="good-job-o"
+          @click="commentNice(item.com_id)"
+          >赞</van-icon
         >
-      </van-row>
-    </div>
+        <van-icon
+          v-show="item.is_liking === true"
+          class="nice"
+          slot="right-icon"
+          name="good-job-o"
+          @click="commentNoNice(item.com_id)"
+          >赞{{ item.like_count }}</van-icon
+        >
+      </van-cell>
+    </van-list>
+
+    <!------------ 回复评论 ------------------------------------------------->
+
+    <!-- 某条评论的界面 -->
+    <van-popup
+      v-model="Replyshow"
+      position="bottom"
+      :style="{ height: '100%' }"
+      closeable
+      class="ReplyCommentPopup"
+    >
+      <!-- KingComment -->
+      <van-cell
+        v-for="(item, index) in KingComment"
+        :key="index"
+        class="ImComments"
+      >
+        <van-image
+          slot="icon"
+          class="img"
+          round
+          width="40"
+          height="40"
+          style="margin-right: 10px"
+          :src="item.aut_photo"
+        />
+        <span style="color: #466b9d" slot="title" class="name">{{
+          item.aut_name
+        }}</span>
+        <div slot="label">
+          <p style="color: #363636">{{ item.content }}</p>
+          <p>
+            <span class="timer">{{ CommentTimer }}</span>
+            <van-button size="small" type="default" round class="Huiff"
+              >回复 {{ item.reply_count }}
+            </van-button>
+          </p>
+        </div>
+      </van-cell>
+      <p class="All-R">全部回复</p>
+      <van-cell v-for="(item, index) in inComment" :key="index">
+        <van-image
+          slot="icon"
+          round
+          width="40"
+          height="40"
+          style="margin-right: 10px"
+          :src="item.aut_photo"
+        />
+        <span style="color: #466b9d" slot="title">{{ item.aut_name }}</span>
+        <div slot="label">
+          <p style="color: #363636">{{ item.content }}</p>
+          <p>
+            <span class="timer">{{ CommentTimer }}</span>
+            <van-button size="small" type="default" round class="Huif"
+              >回复 {{ item.reply_count }}
+            </van-button>
+          </p>
+        </div>
+      </van-cell>
+      <!-- 底部评论 -->
+      <div class="reply-btn-box">
+        <van-button type="primary" class="reply-comment" round @click="rmshow"
+          >评论</van-button
+        >
+        <van-popup
+          v-model="Rmshow"
+          position="bottom"
+          :style="{ height: '15%' }"
+          class="Rmpopup"
+        >
+          <van-field
+            class="Reply-text-box"
+            v-model="commentMessage"
+            rows="2"
+            autosize
+            type="textarea"
+            maxlength="50"
+            placeholder="请输入留言"
+            show-word-limit
+          />
+          <button
+            class="Rarelease"
+            @click="rapRelease"
+            style="
+              position: absolute;
+              right: 0.25rem;
+              top: 1.1rem;
+              background: unset;
+              border: unset;
+              font-size: 0.4rem;
+            "
+          >
+            发布
+          </button>
+        </van-popup>
+      </div>
+    </van-popup>
+    <!------------ 回复评论 ------------------------------------------------->
     <!-- 写评论 -->
     <van-row class="write-comments">
       <van-col span="8">
@@ -164,38 +293,146 @@ import {
   PostFurkNice,
   PostZang,
   PostFurkZang,
-  getComments,
-  getMyComments
+  getMyComments,
+  getActiveComments,
+  getMyInComments,
+  getActiveCommentsNice,
+  getActiveCommentsNoNice
 } from '@/api'
 
 //
+
 import dayjs from '@/utils/dayjs'
 export default {
   data () {
     return {
+      // 存放文章详情
       active: [],
-      addactive: [],
       show: false,
-      message: []
+      // 对文章评论的文本内容
+      message: [],
+      // 评论的评论文本内容
+      commentMessage: [],
+      offset: null,
+      limit: 10,
+      // 对文章评论列表
+      comments: [],
+      Numcomments: [],
+      list: [],
+      loading: false,
+      finished: false,
+      // 评论的开关
+      Replyshow: false,
+      // 评论的评论开关
+      Rmshow: false,
+      total_count: 0,
+      // 存放点击评论的评论列表
+      inComment: [],
+      // 存放点击评论的信息
+      KingComment: [],
+      comId: [],
+      commentNiceId: []
     }
   },
+
   created () {
+    // 加载页面时获取文章数据
     this.getDetailsActive()
-    this.getComments()
+    // 加载页面时获取文章评论
   },
+  // mounted
+
   methods: {
+    commentNoNice (val) {
+      console.log(val)
+      this.commentNiceId = val
+      console.log(this.commentNiceId)
+      this.getActiveCommentsNoNice()
+    },
+    // 对评论点赞
+    commentNice (val) {
+      console.log(val)
+      this.commentNiceId = val
+      console.log(this.commentNiceId)
+      this.getActiveCommentsNice()
+      // console.log(res)
+    },
+    // 对评论的评论进行发布
+    rapRelease () {
+      // console.log(this.commentMessage)
+      if (this.commentMessage.trim() === '') {
+        console.log('内容不能为空')
+      } else {
+        this.getMyInComments()
+        this.Rmshow = false
+        // this.commentMessage = ''
+      }
+    },
+    rmshow () {
+      this.Rmshow = true
+    },
+    // 点击回复调用评论的评论
+    async reply (val) {
+      this.Replyshow = true
+      const res = await getActiveComments('c', val)
+      console.log(res)
+      // 评论里的评论
+      this.inComment = res.data.data.results
+      // 筛选文章评论里符合点击的com_id
+      const str = this.comments.filter((ele) => ele.com_id === val)
+      // 找到后把值传给一个空数组
+      this.KingComment = str
+      console.log(str)
+      console.log('com_id', val)
+      this.comId = val
+      // console.log(this.inComment)
+    },
+    async onLoad () {
+      const res = await getActiveComments(
+        'a',
+        this.active.art_id,
+        this.offset,
+        this.limit
+      )
+      console.log(res)
+      this.Numcomments = res.data.data
+      this.comments = res.data.data.results
+      // 打印所以评论
+      console.log(this.comments)
+      // 总条数
+      this.total_count = res.data.data.total_count
+      if (this.end_id === null) {
+        this.finished = true
+      }
+      this.loading = true
+      if (this.total_count > 10) {
+        this.offset = this.Numcomments.last_id
+      } else {
+        this.finished = true
+      }
+    },
+    // 获取文章评论
+    async getActiveComments () {
+      await getActiveComments('a', this.active.art_id)
+    },
+    // 获取点击评论的评论
+    async getTwoComments () {
+      await getActiveComments('c', this.active.com_id)
+    },
     showPopup () {
       this.show = true
     },
     onClickLeft () {
       this.$router.go(-1)
     },
-    // 获取文章数据
+    // 获取文章数据················································
     async getDetailsActive () {
-      const res = await getDetailsActive(this.$route.params.detailsId)
+      const res = await getDetailsActive(this.$route.query.detailsId)
       console.log(res)
       this.active = res.data.data
+      // console.log('++++', this.active)
     },
+
     // 添加关注
     async PostLike () {
       try {
@@ -240,9 +477,11 @@ export default {
     },
     // 点赞
     async PostZang () {
+      // console.log(this.active.art_id)
       try {
-        const res = await PostZang(this.active.art_id)
-        console.log(res)
+        // this.getActiveComments()
+        await PostZang(this.active.art_id)
+        // console.log(this.active.art_id)
         this.$toast.success('已点赞')
       } catch (e) {
         console.log('Zang', e, this.active.art_id)
@@ -251,38 +490,66 @@ export default {
     // 取消赞
     async PostFurkZang () {
       try {
-        const res = await PostFurkZang(this.active.art_id)
-        console.log(res)
+        await PostFurkZang(this.active.art_id)
+
         this.$toast.success('已取消点赞')
       } catch (e) {
         console.log('Zang', e)
       }
     },
-    // 获得评论
-    async getComments () {
+    // 对评论进行点赞
+    async getActiveCommentsNice () {
       try {
-        const res = await getComments('a', this.active.art_id)
-        // 保存进度 ID发布出去-----------------------------------------------------------
+        // console.log('ac', this.commentNiceId)
+        const res = await getActiveCommentsNice(this.commentNiceId)
+        this.getDetailsActive()
         console.log(res)
       } catch (e) {
-        console.log('评论获取错误，原因是', e)
+        console.log('对评论点赞', e)
       }
     },
+    // 取消点赞
+    async getActiveCommentsNoNice () {
+      try {
+        const res = await getActiveCommentsNoNice(this.commentNiceId)
+        this.getDetailsActive()
+        console.log(res)
+      } catch (e) {
+        console.log('取消', e)
+      }
+    },
+
     // 发布内容
     async getMyComments () {
       try {
-        const res = await getMyComments(
-          this.active.aut_id,
-          this.message,
-          this.active.aut_id
-        )
-        console.log(res)
+        const res = await getMyComments(this.active.art_id, this.message)
+        console.log(res.data.data)
+        const mycomment = res.data.data.new_obj
+        this.comments.unshift(mycomment)
+        this.$toast.success('评论成功')
       } catch (e) {
         console.log('comments', e)
       }
     },
+    // 对评论进行评论发布
+    async getMyInComments () {
+      try {
+        const res = await getMyInComments(
+          this.comId,
+          this.commentMessage,
+          this.active.art_id
+        )
+        const mycomment = res.data.data.new_obj
+        this.inComment.unshift(mycomment)
+        console.log(res)
+        console.log(this.active.art_id)
+      } catch (e) {
+        console.log('comments', e, this.comId, this.commentMessage)
+      }
+    },
 
     // 点击关注/取消关注
+
     AddGuanZ () {
       this.PostLike()
       this.getDetailsActive()
@@ -290,7 +557,6 @@ export default {
 
     NoGuanz () {
       this.PostFurkLike()
-
       this.getDetailsActive()
     },
     // 添加收藏
@@ -334,6 +600,11 @@ export default {
       const art = this.active
       const Timer = dayjs(art.pubdate).fromNow()
       return Timer
+    },
+    CommentTimer () {
+      const art = this.comments
+      const comtimer = dayjs(art.pubdate).fromNow()
+      return comtimer
     }
   }
 }
@@ -379,11 +650,14 @@ h3 {
     }
   }
   .Anniu {
+    position: relative;
     border-radius: 25%;
     margin-left: 0.4rem;
 
     .van-button--info {
-      height: 0.8rem;
+      height: 1rem;
+      width: 2.2rem;
+      right: 0.3rem;
     }
     .van-button--normal {
       font-size: 0.28rem;
@@ -394,21 +668,26 @@ h3 {
     }
     :deep(.noguanz) {
       position: absolute;
-      right: 0.28rem;
-      top: 3.1rem;
       background: #fff;
       color: #323233;
       border-color: #ebedf0;
+      width: 2.2rem;
+      height: 0.9rem;
+      top: 0.1rem;
+      height: 1rem;
+      right: 0.1rem;
     }
   }
 }
 .ZhengWen-box {
   width: 100%;
   margin-top: 0.3rem;
+
   .ZhengWen {
     font-size: 0.32rem;
     margin: 0 0.3rem;
-    white-space: wrap;
+    padding: 0 0.2rem;
+    // white-space: wrap;
   }
 
   .markdown-body {
@@ -435,67 +714,6 @@ h3 {
     background-color: #fff;
     width: 3rem;
     text-align: center;
-  }
-}
-
-.comment {
-  padding: 0 0.65rem;
-  .comment-left {
-    img {
-      width: 1rem;
-      height: 1rem;
-      border-radius: 50%;
-    }
-  }
-  .comment-name {
-    font-size: 0.32rem;
-    color: #406599;
-    margin-left: 0.25rem;
-  }
-  .comment-right {
-    .nice {
-      font-size: 0.4rem;
-    }
-    .num {
-      font-size: 0.25rem;
-      margin-left: 0.1rem;
-    }
-  }
-}
-.comment-pople {
-  border-bottom: 0.01rem solid #eceef1;
-  margin-bottom: 2.5rem;
-  .comment-text {
-    // background-color: #ccc;
-    width: 73%;
-    margin-left: 2rem;
-    height: auto !important;
-    height: 50px;
-    min-height: 50px;
-
-    .text {
-      font-size: 0.3rem;
-      word-break: break-word;
-    }
-  }
-  .reply {
-    margin-left: 2rem;
-    .reply-timer {
-      font-size: 0.35rem;
-      margin-top: 0.075rem;
-    }
-    .reply-btn {
-      width: 2rem;
-      height: 0.6rem;
-      font-size: 0.25rem;
-      bottom: 0.25rem;
-      line-height: 0.6rem;
-      border: 0.02667rem solid #eceef1;
-      .van-button__content {
-        line-height: 100%;
-        color: #3d3d3d;
-      }
-    }
   }
 }
 
@@ -559,5 +777,112 @@ h3 {
       background-color: unset;
     }
   }
+}
+
+.publish-wrap {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.van-list {
+  margin-bottom: 150px;
+  .timer {
+    margin-top: 8px;
+    margin-right: 10px;
+  }
+  .Huif {
+    width: 2rem;
+    height: 0.7rem;
+  }
+
+  // .ReplyCommentPopup {
+  //   .reply-btn-box {
+  //     width: 100%;
+  //     height: 1.35rem;
+  //     background-color: #ff69b4;
+  //     position: fixed;
+  //     left: 0;
+  //     bottom: 0;
+  //     .reply-comment {
+  //       width: 85%;
+  //       color: #000;
+  //       background-color: #fff;
+  //       border: unset;
+  //       height: 75%;
+  //       margin-top: 0.15rem;
+  //       :deep(.text-box) {
+  //         width: 80%;
+  //         background-color: #f5f7f9;
+  //         height: 75%;
+  //         margin-top: 0.35rem;
+  //         margin-left: 0.35rem;
+  //         :deep(.van-field__word-limit) {
+  //           line-height: 0rem;
+  //         }
+  //         :deep(.Rarelease) {
+  //           position: absolute;
+  //           bottom: 1.2rem;
+  //           color: #b5d1ec;
+  //           margin-left: 8.55rem;
+  //           font-size: 0.45rem;
+  //           border: unset;
+  //           background-color: unset;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+}
+
+.ReplyCommentPopup {
+  .ImComments {
+    align-self: start;
+    :deep(.img) {
+      margin-top: 0.55rem;
+    }
+  }
+  .reply-btn-box {
+    width: 100%;
+    height: 1.35rem;
+    background-color: #ff69b4;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    .reply-comment {
+      width: 85%;
+      color: #000;
+      background-color: #fff;
+      border: unset;
+      height: 75%;
+      margin-top: 0.15rem;
+      margin-left: 0.7rem;
+    }
+    .Reply-text-box {
+      width: 80%;
+      background-color: #f5f7f9;
+      height: 75%;
+      margin-top: 0.35rem;
+      margin-left: 0.35rem;
+
+      :deep(.Rarelease) {
+        position: absolute;
+        bottom: 1.2rem;
+        color: #b5d1ec;
+        margin-left: 8.55rem;
+        font-size: 0.45rem;
+        border: unset;
+        background-color: unset;
+      }
+    }
+  }
+}
+.All-R {
+  font-size: 0.4rem;
+  text-align: center;
+}
+:deep(.nice) {
+  color: red;
 }
 </style>

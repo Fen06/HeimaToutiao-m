@@ -52,7 +52,7 @@ export const PostFurkNice = (target) => {
   })
 }
 // /v1_0/article/collections/:target
-
+// 点赞
 export const PostZang = (id) => {
   return request({
     url: '/v1_0/article/likings',
