@@ -13,14 +13,23 @@ export const getMyComments = (target, text) => {
 }
 // /v1_0/comments
 // 获取文章评论
-export const getActiveComments = (type, source) => {
+export const getActiveComments = (type, source, id) => {
   return request({
     url: '/v1_0/comments',
     method: 'GET',
     params: {
       type: type,
-      source: source
+      source: source,
+      offset: id
     }
+  })
+}
+
+export const getActiveCommentsYeshu = (params) => {
+  return request({
+    url: '/v1_0/comments',
+    method: 'GET',
+    params
   })
 }
 // 对文章评论进行点赞

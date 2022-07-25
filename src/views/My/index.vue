@@ -19,7 +19,9 @@
           </van-col>
           <van-col span="11">
             <van-row class="code-row" type="flex" align="center" justify="end">
-              <van-button class="code-btn">编辑资料</van-button>
+              <router-link to="/user">
+                <van-button class="code-btn">编辑资料</van-button></router-link
+              >
             </van-row>
           </van-col>
         </van-row>

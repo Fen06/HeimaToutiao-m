@@ -108,7 +108,7 @@
           slot="right-icon"
           name="good-job-o"
           @click="commentNoNice(item.com_id)"
-          >{{ item.like_count }}</van-icon
+          >赞{{ item.like_count }}</van-icon
         >
       </van-cell>
     </van-list>
@@ -333,10 +333,7 @@ export default {
       // 存放点击评论的信息
       KingComment: [],
       comId: [],
-      commentNiceId: [],
-      lastId: '',
-      endId: '',
-      commentsNum: 0
+      commentNiceId: []
     }
   },
 
@@ -345,7 +342,6 @@ export default {
     this.getDetailsActive()
     // 加载页面时获取文章评论
   },
-
   // mounted
 
   methods: {
@@ -395,67 +391,30 @@ export default {
       this.getActiveComments()
       // console.log(this.inComment)
     },
-    // async onLoad () {
-    //   this.offset++
-    //   const { data } = await getActiveComments(
-    //     'a',
-    //     this.active.art_id,
-    //     this.Numcomments.last_id
-    //   )
-    //   const { results } = data.data
-    //   this.Numcomments.push(...results)
-    //   console.log(this.Numcomments.end_id)
-    //   console.log(data.data)
-    //   // 获取评论的内容，不能动
-    //   this.comments = data.data.results
-    //   // 打印所有评论
-    //   this.loading = false
+    async onLoad () {
+      this.offset++
+      const { data } = await getActiveComments(
+        'a',
+        this.active.art_id,
+        this.Numcomments.last_id
+      )
+      const { results } = data.data
+      this.Numcomments.push(...results)
+      console.log(this.Numcomments.end_id)
+      console.log(data.data)
+      // 获取评论的内容，不能动
+      this.comments = data.data.results
+      // 打印所有评论
+      this.loading = false
 
-    //   if (data.data.end_id === data.data.last_id) {
-    //     this.finished = false
-    //     this.loading = false
-    //   }
-    // },
-
-    async Accomments () {
-      if (this.Numcomments.length > 0) {
-        const { data } = await getActiveComments(
-          'a',
-          this.active.art_id,
-          this.lastId
-        )
-        // this.comments = data.data.results
-        this.Numcomments.push(...data.data.results)
-        this.comments = this.Numcomments
-        console.log(this.Numcomments)
-        this.lastId = data.data.last_id
-        this.loading = false
-
-        if (this.lastId === this.endId) {
-          this.finished = true
-        }
-      } else {
-        const { data } = await getActiveComments('a', this.active.art_id)
-        // this.comments = data.data.results
-        this.lastId = data.data.last_id
-        this.endId = data.data.end_id
-        this.commentsNum = data.data.total_count
-        this.Numcomments.push(...data.data.results)
-        this.comments = this.Numcomments
-        if (this.endId === this.lastId) {
-          this.finished = true
-        }
+      if (data.data.end_id === data.data.last_id) {
+        this.finished = false
         this.loading = false
       }
     },
-
-    onLoad () {
-      this.Accomments()
-    },
     // 获取文章评论
     async getActiveComments () {
-      const res = await getActiveComments('a', this.active.art_id)
-      this.comments = res.data.data.results
+      await getActiveComments('a', this.active.art_id)
     },
     // 获取点击评论的评论
     async getTwoComments () {

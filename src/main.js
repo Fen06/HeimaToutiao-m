@@ -4,10 +4,12 @@ import router from './router'
 import store from './store'
 import './assets/font/iconfont.css'
 import 'github-markdown-css/github-markdown.css'
+
 import Vant from 'vant'
 import 'vant/lib/index.css'
-
+import Element from 'element-ui'
 import 'amfe-flexible/index.js'
+Vue.use(Element, { size: 'small', zIndex: 3000 })
 
 Vue.use(Vant)
 Vue.config.productionTip = false
